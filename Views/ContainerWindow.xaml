@@ -1,0 +1,73 @@
+<Window x:Class="ZenDesk.Views.ContainerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ZenDesk.Views"
+        xmlns:converters="clr-namespace:ZenDesk.Converters"
+        mc:Ignorable="d"
+        Title="{Binding Model.Name}" 
+        Height="{Binding Model.Height, Mode=TwoWay}" 
+        Width="{Binding Model.Width, Mode=TwoWay}"
+        Left="{Binding Model.X, Mode=TwoWay}"
+        Top="{Binding Model.Y, Mode=TwoWay}"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="False"
+        ShowInTaskbar="False"
+        ResizeMode="CanResizeWithGrip">
+    
+    <Window.Resources>
+        <converters:StringToVisibilityConverter x:Key="StringToVisConverter" />
+    </Window.Resources>
+
+    <Border Background="{Binding Model.ColorTheme}" CornerRadius="12" BorderBrush="#30FFFFFF" BorderThickness="1" Margin="15" x:Name="MainBorder">
+        <Border.Effect>
+            <DropShadowEffect Color="Black" BlurRadius="20" Opacity="0.4" Direction="270" ShadowDepth="4" />
+        </Border.Effect>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="36"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <!-- Title Bar -->
+            <Grid Grid.Row="0" Background="Transparent" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <TextBlock Text="{Binding Model.Name}" VerticalAlignment="Center" Margin="12,0,0,0" Foreground="White" FontWeight="SemiBold" FontSize="14"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,4,0">
+                    <Button Content="−" Width="28" Height="28" Background="Transparent" BorderThickness="0" Foreground="White" FontSize="16" Click="Minimize_Click"/>
+                    <Button Content="✕" Width="28" Height="28" Background="Transparent" BorderThickness="0" Foreground="White" FontSize="14" Click="Close_Click"/>
+                </StackPanel>
+            </Grid>
+            
+            <!-- Content Area -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="4">
+                <ItemsControl ItemsSource="{Binding FilteredFiles}" AllowDrop="True" Drop="ItemsControl_Drop" Background="Transparent" Name="FileItemsControl">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Width="72" Height="80" Margin="4" Background="Transparent" AllowDrop="True" Cursor="Hand" MouseLeftButtonDown="FileItem_MouseLeftButtonDown">
+                                <Border Width="40" Height="40" Background="#40FFFFFF" CornerRadius="4" Margin="0,4,0,4" HorizontalAlignment="Center">
+                                    <Image Source="{Binding FileIcon}" Width="32" Height="32" Stretch="Uniform"/>
+                                </Border>
+                                <TextBlock Text="{Binding FileName}" Foreground="White" FontSize="11" TextAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+            
+            <!-- Type to Search Overlay -->
+            <Border Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,10" 
+                    Background="#80000000" CornerRadius="4" Padding="8,4" 
+                    Visibility="{Binding SearchText, Converter={StaticResource StringToVisConverter}}">
+                <TextBlock Text="{Binding SearchText}" Foreground="White" FontWeight="Bold"/>
+            </Border>
+        </Grid>
+    </Border>
+</Window>
